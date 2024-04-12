@@ -6,15 +6,13 @@ canvas {
 
 main {
   position: absolute;
-
   /* Divide the page into 12 columns */
   display: grid;
   grid-template-columns: repeat(12, 1fr);
 }
 
-header {
-  font-size: 160px;
-  align-content: center;
+.header {
+  font-size: 200px;
   grid-column: 2 / 12;
   margin-bottom: var(--spacing);
 }
