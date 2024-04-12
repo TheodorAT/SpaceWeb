@@ -1,0 +1,43 @@
+canvas {
+  position: fixed;
+  top: 0;
+  left: 0;
+}
+
+main {
+  position: absolute;
+
+  /* Divide the page into 12 columns */
+  display: grid;
+  grid-template-columns: repeat(12, 1fr);
+}
+
+header {
+  font-size: 160px;
+  align-content: center;
+  grid-column: 2 / 12;
+  margin-bottom: var(--spacing);
+}
+
+.leftColumn {
+  grid-column: 2 / 8;
+  margin-bottom: var(--spacing);
+  font-size: 120px;
+}
+
+.rightColumn {
+  grid-column: 6 / 12;
+  margin-bottom: var(--spacing);
+  font-size: 120px;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.hideScroll::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.hideScroll {
+  -ms-overflow-style: none; /* IE and Edge */
+  scrollbar-width: none; /* Firefox */
+}
