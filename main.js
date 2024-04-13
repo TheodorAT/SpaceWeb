@@ -1,15 +1,12 @@
 import "./style.css";
 
 import * as THREE from "three";
-import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
-import { max, rotate, sin } from "three/examples/jsm/nodes/Nodes.js";
 
 // System variables:
 const sunPosition = new THREE.Vector3(-200, 0, 0);
 const cameraOrigin = new THREE.Vector3(sunPosition.x, 0, 300);
 const sunRadius = 25;
 const planetSpacing = 70;
-const planetSpacingScaling = 1;
 
 // Creating a scene:
 const scene = new THREE.Scene();
@@ -37,16 +34,6 @@ renderer.render(scene, camera);
 // const torus = new THREE.Mesh(geometry, material);
 // scene.add(torus);
 
-// Adding lights: We will add a point light for each celestial body
-const pointLight = new THREE.PointLight(0xffffff, 1000);
-pointLight.position.set(18, 0, 0);
-const ambientLight = new THREE.AmbientLight(0xffffff);
-scene.add(pointLight, ambientLight);
-
-// Adding helpers:
-const lightHelper = new THREE.PointLightHelper(pointLight);
-scene.add(lightHelper);
-
 // Adding stars:
 const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
 const starMaterial = new THREE.MeshBasicMaterial({
@@ -66,7 +53,7 @@ function addStar() {
 Array(1000).fill().forEach(addStar);
 
 // Adding a background:
-const spaceTexture = new THREE.TextureLoader().load("images/space.jpeg");
+const spaceTexture = new THREE.TextureLoader().load("images/milky_way.jpg");
 scene.background = spaceTexture;
 
 // Adding the planets:
@@ -140,14 +127,10 @@ scene.add(moon);
 
 // Mars:
 const marsTexture = new THREE.TextureLoader().load("images/mars.jpg");
-const marsNormalTexture = new THREE.TextureLoader().load(
-  "images/mars_normal_map.jpg"
-);
 const mars = new THREE.Mesh(
   new THREE.SphereGeometry(4, 32, 32),
   new THREE.MeshStandardMaterial({
     map: marsTexture,
-    normalMap: marsNormalTexture,
   })
 );
 mars.position.set(earth.position.x + planetSpacing, 0, 3);
@@ -177,22 +160,16 @@ scene.add(saturn);
 
 // Adding the rings of Saturn:
 const ringTexture = new THREE.TextureLoader().load("images/saturn_ring.jpg");
-// const ring = new THREE.Mesh(
-//   new THREE.RingGeometry(12, 20, 32),
-//   new THREE.MeshStandardMaterial({
-//     map: ringTexture,
-//     side: THREE.DoubleSide,
-//   })
-// );
 const ring = new THREE.Mesh(
   new THREE.CylinderGeometry(12, 20, 0, 64, 1, true),
-  new THREE.MeshStandardMaterial({
+  new THREE.MeshBasicMaterial({
     map: ringTexture,
     side: THREE.DoubleSide,
   })
 );
-ring.rotation.x = -Math.PI / 6;
-ring.rotation.y = -Math.PI / 6;
+ring.rotation.x = Math.PI / 6;
+ring.rotation.y = -Math.PI / 4;
+ring.rotation.z = Math.PI / 6;
 ring.position.set(saturn.position.x, saturn.position.y, saturn.position.z);
 scene.add(ring);
 
@@ -217,6 +194,25 @@ const neptune = new THREE.Mesh(
 );
 neptune.position.set(uranus.position.x + planetSpacing, 0, -5);
 scene.add(neptune);
+
+// Adding lights for all of the planets:
+
+function addLight(planet, lightStrength, lightDistance) {
+  const light = new THREE.DirectionalLight(0xffffff, lightStrength);
+  light.position.set(
+    planet.position.x - lightDistance,
+    planet.position.y,
+    planet.position.z
+  );
+  light.target = planet;
+  scene.add(light);
+  scene.add(new THREE.PointLightHelper(light));
+}
+
+const lightStrength = 0.4;
+const lightDistance = 40;
+addLight(mercury, lightStrength + 0.2, lightDistance);
+addLight(earth, lightStrength, lightDistance);
 
 camera.lookAt(mercury.position);
 const maxScroll = -13000;
