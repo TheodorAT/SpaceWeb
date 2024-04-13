@@ -3,10 +3,14 @@ import "./style.css";
 import * as THREE from "three";
 
 // System variables:
-const sunPosition = new THREE.Vector3(-200, 0, 0);
-const cameraOrigin = new THREE.Vector3(sunPosition.x, 0, 300);
-const sunRadius = 25;
 const planetSpacing = 70;
+const sunPosition = new THREE.Vector3(-200, 0, 0);
+const cameraOrigin = new THREE.Vector3(
+  sunPosition.x + 3 * planetSpacing,
+  0,
+  300
+);
+const sunRadius = 25;
 
 // Creating a scene:
 const scene = new THREE.Scene();
@@ -196,7 +200,6 @@ neptune.position.set(uranus.position.x + planetSpacing, 0, -5);
 scene.add(neptune);
 
 // Adding lights for all of the planets:
-
 function addLight(planet, lightStrength, lightDistance) {
   const light = new THREE.DirectionalLight(0xffffff, lightStrength);
   light.position.set(
@@ -206,15 +209,14 @@ function addLight(planet, lightStrength, lightDistance) {
   );
   light.target = planet;
   scene.add(light);
-  scene.add(new THREE.PointLightHelper(light));
 }
 
-const lightStrength = 0.4;
-const lightDistance = 40;
+const lightStrength = 0.8;
+const lightDistance = 30;
 addLight(mercury, lightStrength + 0.2, lightDistance);
 addLight(earth, lightStrength, lightDistance);
 
-camera.lookAt(mercury.position);
+camera.lookAt(venus.position.x + 40, 0, 0);
 const maxScroll = -13000;
 const pivotX = sun.position.x - 80;
 const pivotZ = 0;
@@ -225,21 +227,12 @@ const xSpeedInitial = (pivotX - cameraOrigin.x) / pivotLimit;
 const xSpeed = 0.06;
 function moveCamera() {
   const t = document.body.getBoundingClientRect().top;
-  console.log("Scrollfactor: ", t);
-
-  var lookAtX = THREE.MathUtils.lerp(
-    mercury.position.x,
-    neptune.position.x + 40,
-    THREE.MathUtils.clamp(t / maxScroll, 0, 1)
-  );
-  camera.lookAt(lookAtX + 40, 0, 0);
 
   if (t > pivotLimit) {
     camera.position.x = cameraOrigin.x + t * xSpeedInitial;
     camera.position.z = cameraOrigin.z + t * zSpeedInitial;
   } else {
     camera.position.x = pivotX - (t - pivotLimit) * xSpeed;
-
     const interPolationFactor = THREE.MathUtils.clamp(
       Math.pow((camera.position.x - pivotX) / 180, 0.4),
       0,
@@ -258,6 +251,14 @@ function moveCamera() {
 
     camera.position.z = pivotZ + zRoundTheSun + zOscillation;
   }
+  var lookAtX = THREE.MathUtils.lerp(
+    venus.position.x,
+    neptune.position.x + 40,
+    THREE.MathUtils.clamp(t / maxScroll, 0, 1)
+  );
+  camera.lookAt(lookAtX + 40, 0, 0);
+  console.log("Camera position: ", camera.position);
+  console.log("Looking at: ", lookAtX + 40, 0, 0);
 }
 
 document.body.onscroll = moveCamera;
@@ -282,6 +283,9 @@ function rotatePlanets() {
   uranus.rotation.x += earthRotation * 1.5;
   neptune.rotation.y += earthRotation * 1.5;
 }
+
+console.log("Camera position: ", camera.position);
+console.log("Looking at: ", earth.position);
 
 // Animating the scene:
 function animate() {
