@@ -134,7 +134,8 @@ const moon = new THREE.Mesh(
     normalMap: moonNormalTexture,
   })
 );
-moon.position.set(earth.position.x + 10, 10, 0);
+const moonOrbitRadius = 13;
+moon.position.set(earth.position.x + moonOrbitRadius, earth.position.y, 0);
 scene.add(moon);
 
 // Mars:
@@ -175,15 +176,23 @@ saturn.position.set(jupiter.position.x + planetSpacing + 50, 0, 15);
 scene.add(saturn);
 
 // Adding the rings of Saturn:
-const ringTexture = new THREE.TextureLoader().load("images/saturn_ring.png");
+const ringTexture = new THREE.TextureLoader().load("images/saturn_ring.jpg");
+// const ring = new THREE.Mesh(
+//   new THREE.RingGeometry(12, 20, 32),
+//   new THREE.MeshStandardMaterial({
+//     map: ringTexture,
+//     side: THREE.DoubleSide,
+//   })
+// );
 const ring = new THREE.Mesh(
-  new THREE.RingGeometry(12, 20, 32),
+  new THREE.CylinderGeometry(12, 20, 0, 64, 1, true),
   new THREE.MeshStandardMaterial({
     map: ringTexture,
     side: THREE.DoubleSide,
   })
 );
-ring.rotation.x = Math.PI / 2;
+ring.rotation.x = -Math.PI / 6;
+ring.rotation.y = -Math.PI / 6;
 ring.position.set(saturn.position.x, saturn.position.y, saturn.position.z);
 scene.add(ring);
 
@@ -257,17 +266,25 @@ function moveCamera() {
 
 document.body.onscroll = moveCamera;
 
+const earthRotation = 0.0025;
 function rotatePlanets() {
-  sun.rotation.y += 0.001;
-  mercury.rotation.y += 0.001;
-  venus.rotation.y += 0.001;
-  earth.rotation.y += 0.001;
-  moon.rotation.y += 0.001;
-  mars.rotation.y += 0.001;
-  jupiter.rotation.y += 0.001;
-  saturn.rotation.y += 0.001;
-  uranus.rotation.y += 0.001;
-  neptune.rotation.y += 0.001;
+  sun.rotation.y += earthRotation;
+  mercury.rotation.y += earthRotation - 0.0007;
+  venus.rotation.y += earthRotation - 0.0005;
+  earth.rotation.y += earthRotation;
+  moon.rotation.y += earthRotation - 0.0005;
+  moon.position.set(
+    earth.position.x +
+      moonOrbitRadius * Math.cos(moon.rotation.y * 2 * Math.PI),
+    earth.position.y + 4 * Math.sin(moon.rotation.y * 2 * Math.PI),
+    earth.position.z + moonOrbitRadius * Math.sin(moon.rotation.y * 2 * Math.PI)
+  );
+
+  mars.rotation.y += earthRotation;
+  jupiter.rotation.y += earthRotation * 2;
+  saturn.rotation.y += earthRotation * 2;
+  uranus.rotation.x += earthRotation * 1.5;
+  neptune.rotation.y += earthRotation * 1.5;
 }
 
 // Animating the scene:

@@ -15,6 +15,7 @@ main {
 .header {
   font-size: 50px;
   grid-column: 2 / 12;
+  background-color: transparent;
 }
 
 section {
