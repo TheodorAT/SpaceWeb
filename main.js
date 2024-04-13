@@ -2,13 +2,14 @@ import "./style.css";
 
 import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
+import { max, rotate, sin } from "three/examples/jsm/nodes/Nodes.js";
 
 // System variables:
 const sunPosition = new THREE.Vector3(-200, 0, 0);
 const cameraOrigin = new THREE.Vector3(sunPosition.x, 0, 300);
 const sunRadius = 25;
-const planetSpacing = 50;
-const planetSpacingScaling = 1.1;
+const planetSpacing = 70;
+const planetSpacingScaling = 1;
 
 // Creating a scene:
 const scene = new THREE.Scene();
@@ -46,8 +47,6 @@ scene.add(pointLight, ambientLight);
 const lightHelper = new THREE.PointLightHelper(pointLight);
 scene.add(lightHelper);
 
-const controls = new OrbitControls(camera, renderer.domElement);
-
 // Adding stars:
 const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
 const starMaterial = new THREE.MeshBasicMaterial({
@@ -72,15 +71,6 @@ scene.background = spaceTexture;
 
 // Adding the planets:
 
-// Function for calculating the spacing between planets:
-function getPlanetXCoord(index) {
-  return (
-    sunPosition.x +
-    sunRadius +
-    planetSpacing * (index + 1) * Math.pow(planetSpacingScaling, index)
-  );
-}
-
 // Adding the sun:
 const sunTexture = new THREE.TextureLoader().load("images/sun.jpg");
 const sun = new THREE.Mesh(
@@ -104,7 +94,7 @@ const mercury = new THREE.Mesh(
     normalMap: mercuryNormalTexture,
   })
 );
-mercury.position.set(getPlanetXCoord(0), 0, 0);
+mercury.position.set(sunPosition.x + sunRadius + planetSpacing - 10, 0, 13);
 scene.add(mercury);
 
 // Venus:
@@ -115,7 +105,7 @@ const venus = new THREE.Mesh(
     map: venusTexture,
   })
 );
-venus.position.set(getPlanetXCoord(1), 0, 0);
+venus.position.set(mercury.position.x + planetSpacing + 15, 0, 0);
 scene.add(venus);
 
 // Adding the earth:
@@ -129,7 +119,7 @@ const earth = new THREE.Mesh(
     map: earthTexture,
   })
 );
-earth.position.set(getPlanetXCoord(2), 0, 0);
+earth.position.set(venus.position.x + planetSpacing + 1, 0, 4);
 scene.add(earth);
 
 // Adding the moon:
@@ -159,7 +149,7 @@ const mars = new THREE.Mesh(
     normalMap: marsNormalTexture,
   })
 );
-mars.position.set(getPlanetXCoord(3), 0, 0);
+mars.position.set(earth.position.x + planetSpacing, 0, 3);
 scene.add(mars);
 
 // Jupiter:
@@ -170,7 +160,7 @@ const jupiter = new THREE.Mesh(
     map: jupiterTexture,
   })
 );
-jupiter.position.set(getPlanetXCoord(4), 0, 0);
+jupiter.position.set(mars.position.x + planetSpacing + 5, 0, 0);
 scene.add(jupiter);
 
 // Saturn:
@@ -181,7 +171,7 @@ const saturn = new THREE.Mesh(
     map: saturnTexture,
   })
 );
-saturn.position.set(getPlanetXCoord(5), 0, 0);
+saturn.position.set(jupiter.position.x + planetSpacing + 50, 0, 15);
 scene.add(saturn);
 
 // Adding the rings of Saturn:
@@ -205,7 +195,7 @@ const uranus = new THREE.Mesh(
     map: uranusTexture,
   })
 );
-uranus.position.set(getPlanetXCoord(6), 0, 0);
+uranus.position.set(saturn.position.x + planetSpacing - 10, 0, 5);
 scene.add(uranus);
 
 // Neptune:
@@ -216,44 +206,75 @@ const neptune = new THREE.Mesh(
     map: neptuneTexture,
   })
 );
-neptune.position.set(getPlanetXCoord(7), 0, 0);
+neptune.position.set(uranus.position.x + planetSpacing, 0, -5);
 scene.add(neptune);
 
+camera.lookAt(mercury.position);
+const maxScroll = -13000;
+const pivotX = sun.position.x - 80;
+const pivotZ = 0;
+
+const zSpeedInitial = 0.2;
+const pivotLimit = (pivotZ - cameraOrigin.z) / zSpeedInitial;
+const xSpeedInitial = (pivotX - cameraOrigin.x) / pivotLimit;
+const xSpeed = 0.06;
 function moveCamera() {
   const t = document.body.getBoundingClientRect().top;
-  moon.rotation.x += 0.05;
-  moon.rotation.y += 0.075;
-  moon.rotation.z += 0.05;
+  console.log("Scrollfactor: ", t);
 
-  var cameraPivot = new THREE.Vector3(0, 0, 0);
-  document.getElementById("value").innerText =
-    "\n CameraPosition.x: " +
-    camera.position.x +
-    "\n CameraPivot.x: " +
-    cameraPivot.x;
+  var lookAtX = THREE.MathUtils.lerp(
+    mercury.position.x,
+    neptune.position.x + 40,
+    THREE.MathUtils.clamp(t / maxScroll, 0, 1)
+  );
+  camera.lookAt(lookAtX + 40, 0, 0);
 
-  const pivotLimit = -17000;
-  const pivotX = cameraOrigin.x + pivotLimit * 0.004;
-  const pivotZ = cameraOrigin.z + pivotLimit * 0.02;
   if (t > pivotLimit) {
-    camera.position.x = cameraOrigin.x + t * 0.004;
-    camera.position.z = cameraOrigin.z + t * 0.02;
-    camera.lookAt(0, 0, 0);
-    controls.update();
+    camera.position.x = cameraOrigin.x + t * xSpeedInitial;
+    camera.position.z = cameraOrigin.z + t * zSpeedInitial;
   } else {
-    camera.position.x = pivotX - (t - pivotLimit) * 0.03;
-    camera.position.z = pivotZ - (t - pivotLimit) * 0.005;
-    camera.lookAt(1000, 0, 0);
-    controls.update();
+    camera.position.x = pivotX - (t - pivotLimit) * xSpeed;
+
+    const interPolationFactor = THREE.MathUtils.clamp(
+      Math.pow((camera.position.x - pivotX) / 180, 0.4),
+      0,
+      1
+    );
+    const zRoundTheSun = THREE.MathUtils.lerp(
+      (t - pivotLimit) * 0.08,
+      0,
+      interPolationFactor
+    );
+    const zOscillation = THREE.MathUtils.lerp(
+      0,
+      +25 * Math.sin((t - pivotLimit) * 0.0014),
+      interPolationFactor
+    );
+
+    camera.position.z = pivotZ + zRoundTheSun + zOscillation;
   }
 }
 
 document.body.onscroll = moveCamera;
 
+function rotatePlanets() {
+  sun.rotation.y += 0.001;
+  mercury.rotation.y += 0.001;
+  venus.rotation.y += 0.001;
+  earth.rotation.y += 0.001;
+  moon.rotation.y += 0.001;
+  mars.rotation.y += 0.001;
+  jupiter.rotation.y += 0.001;
+  saturn.rotation.y += 0.001;
+  uranus.rotation.y += 0.001;
+  neptune.rotation.y += 0.001;
+}
+
 // Animating the scene:
 function animate() {
   requestAnimationFrame(animate);
-  controls.update();
+  rotatePlanets();
+
   renderer.render(scene, camera);
 }
 animate();
