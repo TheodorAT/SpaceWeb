@@ -100,7 +100,7 @@ venus.position.set(mercury.position.x + planetSpacing + 15, 0, 0);
 scene.add(venus);
 
 // Adding the earth:
-const earthTexture = new THREE.TextureLoader().load("images/earth.jpg");
+const earthTexture = new THREE.TextureLoader().load("images/earth2.jpg");
 const earthNormalTexture = new THREE.TextureLoader().load(
   "images/earth_normal_map.tif"
 );
@@ -196,7 +196,7 @@ const neptune = new THREE.Mesh(
     map: neptuneTexture,
   })
 );
-neptune.position.set(uranus.position.x + planetSpacing, 0, -5);
+neptune.position.set(uranus.position.x + planetSpacing + 7, 0, -5);
 scene.add(neptune);
 
 // Adding lights for all of the planets:
