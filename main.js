@@ -29,14 +29,6 @@ renderer.setSize(window.innerWidth, window.innerHeight);
 camera.position.set(cameraOrigin.x, cameraOrigin.y, cameraOrigin.z);
 renderer.render(scene, camera);
 
-// Adding a torus:
-// const geometry = new THREE.TorusGeometry(10, 3, 16, 100);
-// const material = new THREE.MeshStandardMaterial({
-//   color: 0xff6347,
-// });
-// const torus = new THREE.Mesh(geometry, material);
-// scene.add(torus);
-
 // Adding stars:
 const starGeometry = new THREE.SphereGeometry(0.25, 24, 24);
 const starMaterial = new THREE.MeshBasicMaterial({
@@ -100,9 +92,6 @@ scene.add(venus);
 
 // Adding the earth:
 const earthTexture = new THREE.TextureLoader().load("images/earth2.jpg");
-const earthNormalTexture = new THREE.TextureLoader().load(
-  "images/earth_normal_map.tif"
-);
 const earth = new THREE.Mesh(
   new THREE.SphereGeometry(6, 32, 32),
   new THREE.MeshStandardMaterial({
