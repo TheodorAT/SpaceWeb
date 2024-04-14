@@ -245,8 +245,6 @@ function moveCamera() {
     THREE.MathUtils.clamp(t / maxScroll, 0, 1)
   );
   camera.lookAt(lookAtX + 40, 0, 0);
-  console.log("Camera position: ", camera.position);
-  console.log("Looking at: ", lookAtX + 40, 0, 0);
 }
 
 document.body.onscroll = moveCamera;
@@ -271,9 +269,6 @@ function rotatePlanets() {
   uranus.rotation.x += earthRotation * 1.5;
   neptune.rotation.y += earthRotation * 1.5;
 }
-
-console.log("Camera position: ", camera.position);
-console.log("Looking at: ", earth.position);
 
 // Animating the scene:
 function animate() {
