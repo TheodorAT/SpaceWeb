@@ -255,12 +255,13 @@ function rotatePlanets() {
   mercury.rotation.y += earthRotation - 0.0007;
   venus.rotation.y += earthRotation - 0.0005;
   earth.rotation.y += earthRotation;
-  moon.rotation.y += earthRotation - 0.0005;
+  moon.rotation.y -= earthRotation * 2;
   moon.position.set(
     earth.position.x +
-      moonOrbitRadius * Math.cos(moon.rotation.y * 2 * Math.PI),
-    earth.position.y + 4 * Math.sin(moon.rotation.y * 2 * Math.PI),
-    earth.position.z + moonOrbitRadius * Math.sin(moon.rotation.y * 2 * Math.PI)
+      moonOrbitRadius * Math.cos(earth.rotation.y * 2 * Math.PI),
+    earth.position.y + 4 * Math.sin(earth.rotation.y * 2 * Math.PI),
+    earth.position.z +
+      moonOrbitRadius * Math.sin(earth.rotation.y * 2 * Math.PI)
   );
 
   mars.rotation.y += earthRotation;

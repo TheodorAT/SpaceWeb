@@ -12,14 +12,15 @@ main {
   color: antiquewhite;
 }
 
+/* Conversion from px to ww: 50px = 3.27vw => 1 px = 3.27/50 = 0.0654 vw */
 .header {
-  font-size: 50px;
+  font-size: 3.27vw;
   grid-column: 2 / 12;
   background-color: transparent;
 }
 
 section {
-  font-size: 30px;
+  font-size: 1.95vw;
   background-color: black;
   padding: 10px;
 }
